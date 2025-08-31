@@ -1,1 +1,24 @@
--- aqui vai o SQL que já te passei
+CREATE TABLE IF NOT EXISTS boards (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS columns_board (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  board_id INT NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  position INT NOT NULL,
+  FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS cards (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  board_id INT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  current_column_id INT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE,
+  FOREIGN KEY (current_column_id) REFERENCES columns_board(id) ON DELETE SET NULL
+);
