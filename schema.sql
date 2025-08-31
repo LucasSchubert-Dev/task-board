@@ -1,0 +1,47 @@
+CREATE TABLE IF NOT EXISTS boards (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS columns_board (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  board_id INT NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  type ENUM('initial','pending','final','cancel') NOT NULL,
+  position INT NOT NULL,
+  FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS cards (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  board_id INT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  blocked TINYINT(1) DEFAULT 0,
+  current_column_id INT,
+  closed TINYINT(1) DEFAULT 0,
+  FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE,
+  FOREIGN KEY (current_column_id) REFERENCES columns_board(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS card_history (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  card_id INT NOT NULL,
+  column_id INT NOT NULL,
+  entered_at DATETIME NOT NULL,
+  left_at DATETIME DEFAULT NULL,
+  FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE,
+  FOREIGN KEY (column_id) REFERENCES columns_board(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS card_blocks (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  card_id INT NOT NULL,
+  blocked_at DATETIME NOT NULL,
+  unblocked_at DATETIME DEFAULT NULL,
+  reason_block TEXT,
+  reason_unblock TEXT,
+  FOREIGN KEY (card_id) REFERENCES cards(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
